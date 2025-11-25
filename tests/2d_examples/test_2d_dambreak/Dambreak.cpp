@@ -135,11 +135,11 @@ int main(int ac, char *av[])
     //	Setup for time-stepping control
     //----------------------------------------------------------------------
     size_t number_of_iterations = sph_system.RestartStep();
-    int screen_output_interval = 100;
+    int screen_output_interval = 1;
     int observation_sample_interval = screen_output_interval * 2;
     int restart_output_interval = screen_output_interval * 10;
     Real end_time = 20.0;
-    Real output_interval = 0.1;
+    Real output_interval = 1;
     //----------------------------------------------------------------------
     //	Statistics for CPU time
     //----------------------------------------------------------------------

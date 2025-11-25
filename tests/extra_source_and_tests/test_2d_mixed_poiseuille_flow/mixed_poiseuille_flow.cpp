@@ -18,15 +18,15 @@ using namespace SPH;
 //----------------------------------------------------------------------
 Real DL = 0.004;                                             /**< Channel length. */
 Real DH = 0.001;                                             /**< Channel height. */
-Real resolution_ref = DH / 20.0;                             /**< Initial reference particle spacing. */
+Real resolution_ref = DH / 100.0;                             /**< Initial reference particle spacing. */
 Real BW = resolution_ref * 4;                                /**< Extending width for BCs. */
 StdVec<Vecd> observer_location = {Vecd(0.5 * DL, 0.5 * DH)}; /**< Displacement observation point. */
 BoundingBox system_domain_bounds(Vec2d(-BW, -BW), Vec2d(DL + BW, DH + BW));
 //----------------------------------------------------------------------
 //	Material parameters.
 //----------------------------------------------------------------------
-Real Inlet_pressure = 0.2;
-Real Outlet_pressure = 0.1;
+Real Inlet_pressure = 0.1;
+Real Outlet_pressure = 0;
 Real rho0_f = 1000.0;
 Real Re = 50.0;
 Real mu_f = sqrt(rho0_f * pow(0.5 * DH, 3.0) * fabs(Inlet_pressure - Outlet_pressure) / (Re * DL));
@@ -82,10 +82,10 @@ struct InflowVelocity
         Vecd target_velocity = Vecd::Zero();
         Real run_time = GlobalStaticVariables::physical_time_;
 
-        u_ave = fabs(Inlet_pressure - Outlet_pressure) * (position[1] + 0.5 * DH) * (position[1] + 0.5 * DH - DH) / (2.0 * mu_f * DL) +
+        /*u_ave = fabs(Inlet_pressure - Outlet_pressure) * (position[1] + 0.5 * DH) * (position[1] + 0.5 * DH - DH) / (2.0 * mu_f * DL) +
                 (4.0 * fabs(Inlet_pressure - Outlet_pressure) * DH * DH) /
-                    (mu_f * DL * Pi * Pi * Pi) * sin(Pi * (position[1] + 0.5 * DH) / DH) * exp(-(Pi * Pi * mu_f * run_time) / (DH * DH));
-
+                    (mu_f * DL * Pi * Pi * Pi) * sin(Pi * (position[1] + 0.5 * DH) / DH) * exp(-(Pi * Pi * mu_f * run_time) / (DH * DH));*/
+        u_ave = fabs(Inlet_pressure - Outlet_pressure) * (position[1] + 0.5 * DH) * (position[1] + 0.5 * DH - DH) / (2.0 * mu_f * DL);
         target_velocity[0] = u_ave;
         target_velocity[1] = 0.0;
 
@@ -145,7 +145,7 @@ int main(int ac, char *av[])
     //----------------------------------------------------------------------
     //	Build up an SPHSystem and IO environment.
     //----------------------------------------------------------------------
-    SPHSystem sph_system(system_domain_bounds, resolution_ref);
+    SPHSystem  sph_system(system_domain_bounds, resolution_ref);
     sph_system.handleCommandlineOptions(ac, av)->setIOEnvironment();
     //----------------------------------------------------------------------
     //	Creating bodies with corresponding materials and particles.

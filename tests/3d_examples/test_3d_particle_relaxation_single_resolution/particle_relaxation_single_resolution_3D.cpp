@@ -24,22 +24,22 @@ Real scaling = 1.0; */
 //	Setting for the second geometry.
 //	To use this, please commenting the setting for the first geometry.
 //----------------------------------------------------------------------
-std::string full_path_to_file = "./input/triangle_prism.stl";
+std::string full_path_to_file = "./input/constrain1long.stl";
 //----------------------------------------------------------------------
 //	Basic geometry parameters and numerical setup.
 //----------------------------------------------------------------------
 Real DL = 0.75; // Domain width.
 Real DH = 1.3;  // Domain height.
 Real DW = 1.2;  // Domain width.
-Vec3d domain_lower_bound(-0.2, -0.2, -0.2);
-Vec3d domain_upper_bound(DL, DH, DW);
-Vecd translation(0.5 * DL, 0.5 * DH, 0.5 * DW);
-Real scaling = 2.5;
+Vec3d domain_lower_bound(-0.025, 0.0325, -0.025);
+Vec3d domain_upper_bound(0.025, 0.0905, 0.025);
+Vecd translation(0, 0, 0);
+Real scaling = 0.0001;
 //----------------------------------------------------------------------
 //	Below are common parts for the two test geometries.
 //----------------------------------------------------------------------
 BoundingBox system_domain_bounds(domain_lower_bound, domain_upper_bound);
-Real dp_0 = (domain_upper_bound[0] - domain_lower_bound[0]) / 100.0;
+Real dp_0 = 0.00005;
 //----------------------------------------------------------------------
 //	define the imported model.
 //----------------------------------------------------------------------
@@ -48,8 +48,8 @@ class SolidBodyFromMesh : public ComplexShape
   public:
     explicit SolidBodyFromMesh(const std::string &shape_name) : ComplexShape(shape_name)
     {
-        add<ExtrudeShape<TriangleMeshShapeSTL>>(4.0 * dp_0, full_path_to_file, translation, scaling);
-        subtract<TriangleMeshShapeSTL>(full_path_to_file, translation, scaling);
+        
+        add<TriangleMeshShapeSTL>(full_path_to_file, translation, scaling);
     }
 };
 //-----------------------------------------------------------------------------------------------------------
@@ -106,7 +106,7 @@ int main(int ac, char *av[])
     {
         relaxation_step_inner.exec();
         ite_p += 1;
-        if (ite_p % 100 == 0)
+        if (ite_p % 10 == 0)
         {
             std::cout << std::fixed << std::setprecision(9) << "Relaxation steps for the imported model N = " << ite_p << "\n";
             write_imported_model_to_vtp.writeToFile(ite_p);

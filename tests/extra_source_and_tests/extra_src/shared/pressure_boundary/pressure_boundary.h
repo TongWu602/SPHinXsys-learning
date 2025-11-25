@@ -46,17 +46,24 @@ class PressureCondition : public BaseFlowBoundaryCondition
           aligned_box_(aligned_box_part.aligned_box_),
           transform_(aligned_box_.getTransform()), 
           target_pressure_(*this),
-          kernel_sum_(*particles_->getVariableByName<Vecd>("KernelSummation")){};
+          kernel_sum_(*particles_->getVariableByName<Vecd>("KernelSummation")),
+          buffer_particle_indicator_(*particles_->getVariableByName<int>("BufferParticleIndicator")){};
+          
     virtual ~PressureCondition(){};
     AlignedBoxShape &getAlignedBox() { return aligned_box_; };
 
     void update(size_t index_i, Real dt = 0.0)
     {
+        if (buffer_particle_indicator_[index_i] ==1)
+        {
             vel_[index_i] += 2.0 * kernel_sum_[index_i] * target_pressure_(p_[index_i]) / rho_[index_i] * dt;
 
             Vecd frame_velocity = Vecd::Zero();
             frame_velocity[0] = transform_.xformBaseVecToFrame(vel_[index_i])[0];
             vel_[index_i] = transform_.xformFrameVecToBase(frame_velocity);
+        }
+            
+        
     };
 
   protected:
@@ -64,6 +71,7 @@ class PressureCondition : public BaseFlowBoundaryCondition
     Transform &transform_;
     TargetPressure target_pressure_;
     StdLargeVec<Vecd> &kernel_sum_;
+    StdLargeVec<int> &buffer_particle_indicator_;
 };
 } // namespace fluid_dynamics
 } // namespace SPH
